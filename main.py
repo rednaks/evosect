@@ -3,7 +3,6 @@
 
 
 import pygame
-import pygame_menu
 
 from constants import *
 from objects import *
