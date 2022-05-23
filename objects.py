@@ -18,9 +18,10 @@ class Dot:
 
 
 class Agent(Dot):
-    def __init__(self, color, initial_position, agent_id):
+    def __init__(self, color, initial_position, agent_id, steps):
         super().__init__(color, initial_position)
-        self.brain = Brain(400)
+        self.steps = steps
+        self.brain = Brain(self.steps)
         self.dead = False
         self.name = f"{agent_id}"
 
@@ -57,7 +58,7 @@ class Agent(Dot):
         if not self.dead and not self.goal_reached:
             self.move()
 
-            if self.pos.x < 2 or self.pos.y < 2 or self.pos.x > WIDTH-2 or self.pos.y > HEIGHT-2:
+            if self.pos.x < 2 or self.pos.y < 2 or self.pos.x > SCENE_WIDTH-2 or self.pos.y > SCENE_HEIGHT-2:
                 #print(f"Agent #{self.name} is beyong the universe, dead")
                 self.dead = True
             elif Vector2(self.rect.center).distance_to(Vector2(goal.rect.center)) < 5:
@@ -78,8 +79,9 @@ class Agent(Dot):
 
             self.fitness = 1.0 / (distance_to_goal ** 2)
 
-    def give_birth(self):
-        agent = Agent(BLACK, (WIDTH/2, HEIGHT-10), agent_id=f"{self.name}X")
+    def give_birth(self, birth_id):
+        agent = Agent(BLACK, (SCENE_WIDTH/2, SCENE_HEIGHT-10), 
+                      agent_id=f"{self.name}:{birth_id}", steps=self.steps)
         agent.brain = self.brain.clone()
         return agent
 

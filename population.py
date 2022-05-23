@@ -6,7 +6,7 @@ from constants import *
 
 
 class Population:
-    def __init__(self, size):
+    def __init__(self, size, steps):
         self.agents = []
 
         self._dead_agents = set()
@@ -16,10 +16,12 @@ class Population:
 
         self.generation = 1
         self.best_parent =  0
-        self.min_steps = 400
+        self.min_steps = steps
 
         for i in range(size):
-            self.agents.append(Agent(BLACK, (WIDTH/2, HEIGHT-10), agent_id=i))
+            self.agents.append(
+                Agent(BLACK, (SCENE_WIDTH/2, SCENE_HEIGHT-10), agent_id=i, steps=steps)
+            )
 
     def draw(self, screen):
         for i,dot in enumerate(self.agents):
@@ -54,6 +56,7 @@ class Population:
         for a in self.agents:
             if a.goal_reached:
                 survivors += 1
+                print(f"agent {a.name} survived")
                 
         print(f"survivors of gen {self.generation} = {survivors}, min step: {self.min_steps}")
         print(f"rate: {survivors/len(self.agents)*100}%")
@@ -67,12 +70,12 @@ class Population:
         print(self.best_parent)
         print(len(self.agents))
 
-        new_agents.append(self.agents[self.best_parent].give_birth())
+        new_agents.append(self.agents[self.best_parent].give_birth(0))
         new_agents[0].is_best = True
 
-        for _ in range(1, len(self.agents)):
+        for i in range(1, len(self.agents)):
             parent = self.select_parent()
-            new_agents.append(parent.give_birth())
+            new_agents.append(parent.give_birth(i))
 
         self.agents = new_agents.copy()
 
@@ -98,18 +101,18 @@ class Population:
                 return d
 
 
-    def mutate_babies(self):
+    def mutate_babies(self, mutation_rate):
         for i, a in enumerate(self.agents):
             if i == 0:
                 continue
-            a.brain.mutate()
+            a.brain.mutate(mutation_rate)
 
     def set_best_agent(self):
         _max = 0
         max_index = 0
         for i, a in enumerate(self.agents):
             if a.fitness > _max:
-                print(f"new best fitness ({a.name}): {a.fitness}, won: {a.goal_reached}")
+                #print(f"new best fitness ({a.name}): {a.fitness}, won: {a.goal_reached}")
                 _max = a.fitness
                 max_index = i
         self.best_parent = max_index

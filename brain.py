@@ -22,8 +22,7 @@ class Brain:
             clone_brain.directions[i] = Vector2(di.x, di.y)
         return clone_brain
 
-    def mutate(self):
-        mutation_rate = 0.01
+    def mutate(self, mutation_rate=0.01):
 
         for i, v in enumerate(self.directions):
             if i == 0:
